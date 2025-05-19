@@ -64,15 +64,15 @@ app.layout = dbc.Container([
     ], className="mb-4"),
 
     dbc.Row([
-        dbc.Col(dcc.Graph(id='grafico_ano'), md=6),
+        dbc.Col(dcc.Graph(id='grafico_pizza_tipo'), md=6),
         dbc.Col(dcc.Graph(id='grafico_produto'), md=6),
     ]),
     dbc.Row([
-        dbc.Col(dcc.Graph(id='grafico_loja'), md=6),
-        dbc.Col(dcc.Graph(id='grafico_pizza_tipo'), md=6),
+        dbc.Col(dcc.Graph(id='grafico_area_tempo'), md=12),
     ]),
     dbc.Row([
-        dbc.Col(dcc.Graph(id='grafico_area_tempo'), md=12),
+        dbc.Col(dcc.Graph(id='grafico_loja'), md=6),
+        dbc.Col(dcc.Graph(id='grafico_ano'), md=6),
     ]),
 ], fluid=True)
 
@@ -112,22 +112,22 @@ def atualizar_graficos(tipo, marca, produtos, lojas):
 
     fig1 = px.bar(df.groupby("Ano")["Valor da Venda"].sum().reset_index(),
                   x="Ano", y="Valor da Venda", title="Vendas por Ano",
-                  color_discrete_sequence=["#00BFFF"], template='plotly_dark')
+                  color_discrete_sequence=["#FF1493"], template='plotly_dark')
 
     fig2 = px.bar(df.groupby("Produto")["Valor da Venda"].sum().nlargest(10).reset_index(),
                   x="Valor da Venda", y="Produto", orientation='h',
-                  title="Top 10 Produtos", color_discrete_sequence=["#FF7F50"], template='plotly_dark')
+                  title="Top 10 Produtos", color_discrete_sequence=["#00FA9A"], template='plotly_dark')
 
     fig3 = px.bar(df.groupby("Nome da Loja")["Valor da Venda"].sum().reset_index(),
                   x="Nome da Loja", y="Valor da Venda", title="Vendas por Loja",
-                  color_discrete_sequence=["#FFD700"], template='plotly_dark')
+                  color_discrete_sequence=["#FFA07A"], template='plotly_dark')
 
     fig4 = px.pie(df, names="Tipo do Produto", values="Valor da Venda", title="Distribuição por Tipo de Produto",
-                  color_discrete_sequence=px.colors.qualitative.Set3, template='plotly_dark')
+                  color_discrete_sequence=px.colors.qualitative.Pastel, template='plotly_dark')
 
     fig5 = px.area(df.groupby("Mês")["Valor da Venda"].sum().reset_index(),
                    x="Mês", y="Valor da Venda", title="Evolução Mensal de Vendas",
-                   color_discrete_sequence=["#1E90FF"], template='plotly_dark')
+                   color_discrete_sequence=["#9370DB"], template='plotly_dark')
 
     return fig1, fig2, fig3, fig4, fig5
 

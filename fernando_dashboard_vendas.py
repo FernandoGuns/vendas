@@ -46,8 +46,8 @@ filtros = {
     "tipo": base["Tipo do Produto"].dropna().unique(),
 }
 
-# App Dash
-app = dash.Dash(__name__, external_stylesheets=[dbc.themes.CYBORG])
+# App Dash com tema padrão (fundo branco)
+app = dash.Dash(__name__)
 server = app.server
 
 app.layout = dbc.Container([
@@ -74,6 +74,9 @@ app.layout = dbc.Container([
         dbc.Col(dcc.Graph(id='grafico_loja'), md=6),
         dbc.Col(dcc.Graph(id='grafico_ano'), md=6),
     ]),
+    dbc.Row([
+        dbc.Col(dcc.Graph(id='grafico_cliente'), md=12),
+    ]),
 ], fluid=True)
 
 @app.callback(
@@ -91,7 +94,8 @@ def atualizar_marcas(tipo):
      Output('grafico_produto', 'figure'),
      Output('grafico_loja', 'figure'),
      Output('grafico_pizza_tipo', 'figure'),
-     Output('grafico_area_tempo', 'figure')],
+     Output('grafico_area_tempo', 'figure'),
+     Output('grafico_cliente', 'figure')],
     [Input('filtro_tipo', 'value'),
      Input('filtro_marca', 'value'),
      Input('filtro_produto', 'value'),
@@ -112,24 +116,28 @@ def atualizar_graficos(tipo, marca, produtos, lojas):
 
     fig1 = px.bar(df.groupby("Ano")["Valor da Venda"].sum().reset_index(),
                   x="Ano", y="Valor da Venda", title="Vendas por Ano",
-                  color_discrete_sequence=["#FF1493"], template='plotly_dark')
+                  color_discrete_sequence=["#4682B4"], template='plotly_white')
 
     fig2 = px.bar(df.groupby("Produto")["Valor da Venda"].sum().nlargest(10).reset_index(),
                   x="Valor da Venda", y="Produto", orientation='h',
-                  title="Top 10 Produtos", color_discrete_sequence=["#00FA9A"], template='plotly_dark')
+                  title="Top 10 Produtos", color_discrete_sequence=["#2E8B57"], template='plotly_white')
 
     fig3 = px.bar(df.groupby("Nome da Loja")["Valor da Venda"].sum().reset_index(),
                   x="Nome da Loja", y="Valor da Venda", title="Vendas por Loja",
-                  color_discrete_sequence=["#FFA07A"], template='plotly_dark')
+                  color_discrete_sequence=["#FF8C00"], template='plotly_white')
 
     fig4 = px.pie(df, names="Tipo do Produto", values="Valor da Venda", title="Distribuição por Tipo de Produto",
-                  color_discrete_sequence=px.colors.qualitative.Pastel, template='plotly_dark')
+                  color_discrete_sequence=px.colors.qualitative.Set2, template='plotly_white')
 
     fig5 = px.area(df.groupby("Mês")["Valor da Venda"].sum().reset_index(),
                    x="Mês", y="Valor da Venda", title="Evolução Mensal de Vendas",
-                   color_discrete_sequence=["#9370DB"], template='plotly_dark')
+                   color_discrete_sequence=["#6A5ACD"], template='plotly_white')
 
-    return fig1, fig2, fig3, fig4, fig5
+    fig6 = px.scatter(df.groupby("ID Cliente")["Valor da Venda"].sum().nlargest(10).reset_index(),
+                      x="ID Cliente", y="Valor da Venda", size="Valor da Venda",
+                      title="Top 10 Clientes por Valor de Venda", color_discrete_sequence=["#DC143C"], template='plotly_white')
+
+    return fig1, fig2, fig3, fig4, fig5, fig6
 
 if __name__ == '__main__':
     app.run(debug=True)
